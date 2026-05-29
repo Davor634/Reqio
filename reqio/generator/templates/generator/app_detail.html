@@ -1,0 +1,386 @@
+{% extends 'generator/base.html' %}
+
+{% block content %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/10.0.3/jsoneditor.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/10.0.3/jsoneditor.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        h1, h2 {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+
+        h3 {
+            font-size: 1em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        p {
+            margin-top: 0;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .subsection {
+            margin-left: 20px;
+        }
+
+        #jsoneditor, #saveBtn{
+            display: none;
+        }
+
+        body {
+        height: 2000px; 
+        margin: 0;
+        font-family: Arial, sans-serif;
+        }
+        
+        .btn-outline-success {
+            position: fixed;
+            top: 90px;
+            right: 30px;
+            padding: 10px 20px;
+            cursor: pointer;
+           
+        }
+
+        .btn-outline-danger{
+            position: fixed;
+            top: 150px;
+            right: 30px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        #srs-container, #json-container {
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .container {
+            display: flex;
+        }
+
+        .div1, .div2 {
+            flex: 1;
+            padding: 10px;
+            margin: 5px;
+        }
+    </style>
+
+
+    <div class="container-fluid">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                <div class="row align-items-center">
+
+                    <div class="col-8 text-start mb-3">
+                        <h2 class="display-6 text-start ps-3">
+                            {{app.name}}
+                        </h2>
+                    </div>
+    
+                    <div class="col-4 align-items-center">
+                        <div class="row mx-5">
+                            <button id="showButton" class="btn btn-outline-primary">Edit document Using the Assistant</button>
+                        </div>
+
+                        <form action="{% url 'generator:change' app.id %}" method="post" class="row align-items-center">
+                            {% csrf_token %}
+                            
+                            <div class="col-auto">
+                                <input type="text" class="form-control" id="user_input" name="user_input" style="display:none;" required>
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" id="applyButton" style="display:none;" class="btn btn-outline-primary">Apply</button>
+                            </div>
+
+                            <div id="assistantBlock" class="form-text" style="display:none;">
+                                change or add features to your requirements document
+                            </div>
+                        </form>
+                        
+                    </div>
+                </div>
+
+                
+
+                <script>
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+                    document.addEventListener("DOMContentLoaded", function() {
+                        var path = window.location.pathname;
+            
+                        if (path.endsWith('/change')) {
+
+                            var form1 = document.createElement('form');
+                            form1.action='{% url "generator:apply" app.id %}';
+                            form1.method='post';
+
+                            const csrfInput = document.createElement('input');
+                            csrfInput.setAttribute('type', 'hidden');
+                            csrfInput.setAttribute('name', 'csrfmiddlewaretoken');
+                            csrfInput.setAttribute('value', csrfToken);
+                            form1.appendChild(csrfInput);
+
+                            var form2 = document.createElement('form');
+                            form2.action='{% url "generator:apply" app.id %}';
+                            form2.method='post';
+
+                            const csrfInput2 = document.createElement('input');
+                            csrfInput2.setAttribute('type', 'hidden');
+                            csrfInput2.setAttribute('name', 'csrfmiddlewaretoken');
+                            csrfInput2.setAttribute('value', csrfToken);
+                            form2.appendChild(csrfInput2);                            
+
+                            var button = document.createElement('button');
+                            button.className = 'btn btn-outline-success';
+                            button.setAttribute('name', 'action');
+                            button.setAttribute('value', 'Apply');
+                            button.textContent = 'Apply Changes';
+
+                            var button2 = document.createElement('button');
+                            button2.className = 'btn btn-outline-danger';
+                            button2.setAttribute('name', 'action');
+                            button2.setAttribute('value', 'Discard');
+                            button2.textContent = 'Discard Changes';
+            
+                            form1.appendChild(button);
+                            form2.appendChild(button2);
+                            document.body.appendChild(form1);
+                            document.body.appendChild(form2);
+
+                            document.getElementById("showButton").style.display = "none"
+
+                        }
+                        else{
+                            var form3 = document.createElement('form');
+                            form3.action='{% url "generator:delete" app.id %}';
+                            form3.method='post';
+
+                            const csrfInput3 = document.createElement('input');
+                            csrfInput3.setAttribute('type', 'hidden');
+                            csrfInput3.setAttribute('name', 'csrfmiddlewaretoken');
+                            csrfInput3.setAttribute('value', csrfToken);
+                            form3.appendChild(csrfInput3);                            
+
+                            var button3 = document.createElement('button');
+                            button3.className = 'btn btn-outline-danger';
+                            button3.setAttribute('name', 'action');
+                            button3.setAttribute('value', 'Delete');
+                            button3.textContent = 'Delete';
+
+                            form3.appendChild(button3);
+                            document.body.appendChild(form3);
+                        }
+                        
+                    });
+                </script>
+
+                <div id="container" class="container">
+                    <div id="srs-container"></div>
+                    <div id="json-container"></div>
+                </div>
+
+
+                <div id="jsoneditor" style="width: 100%; height: 600px;"></div>
+
+                <button id="saveBtn">Save</button>
+                <button id="editBtn">Edit</button>
+
+            </li>
+            
+        </ul>
+    </div>
+
+    <script>
+        document.getElementById('showButton').addEventListener('click', function() {
+            this.style.display = 'none';
+
+            document.getElementById('user_input').style.display = 'inline';
+            document.getElementById('assistantBlock').style.display = 'inline';
+            document.getElementById('applyButton').style.display = 'inline';
+        });
+
+
+        document.getElementById("editBtn").addEventListener("click", function() {
+            document.getElementById("jsoneditor").style.display = "block";
+            document.getElementById("saveBtn").style.display = "block";
+            this.style.display = "none";
+        });
+
+        //======================================================================
+
+        function displaySRS(srs, containerId) {
+            var container = document.getElementById(containerId);
+
+            for (var section in srs) {
+                if (srs.hasOwnProperty(section)) {
+                    var sectionElement = document.createElement("div");
+                    sectionElement.classList.add("section");
+
+                    var titleElement = document.createElement("h1");
+                    titleElement.textContent = section;
+                    sectionElement.appendChild(titleElement);
+
+                    if (typeof srs[section] === "object") {
+                        displaySubsections(srs[section], sectionElement);
+                    } else {
+                        var contentElement = document.createElement("p");
+                        contentElement.textContent = srs[section];
+                        sectionElement.appendChild(contentElement);
+                    }
+
+                    container.appendChild(sectionElement);
+                }
+            }
+        }
+
+        function displaySubsections(subsections, parentElement) {
+            for (var subsection in subsections) {
+                if (subsections.hasOwnProperty(subsection)) {
+                    var subsectionElement = document.createElement("div");
+                    subsectionElement.classList.add("subsection");
+
+                    var titleElement = document.createElement("h2");
+                    titleElement.textContent = subsection;
+                    subsectionElement.appendChild(titleElement);
+
+                    if (typeof subsections[subsection] === "object") {
+                        displayContent(subsections[subsection], subsectionElement);
+                    } else {
+                        var contentElement = document.createElement("p");
+                        contentElement.textContent = subsections[subsection];
+                        subsectionElement.appendChild(contentElement);
+                    }
+
+                    parentElement.appendChild(subsectionElement);
+                }
+            }
+        }
+
+        function displayContent(content, parentElement) {
+            for (var key in content) {
+                if (content.hasOwnProperty(key)) {
+                    if (typeof content[key] === "object") {
+                        var contentElement = document.createElement("p");
+                        contentElement.innerHTML = "<strong>" + key + ":</strong> ";
+                        parentElement.appendChild(contentElement);
+                        displaySubsections(content[key], parentElement);
+                    } else {
+                        var contentElement = document.createElement("p");
+                        contentElement.innerHTML = "<strong>" + key + ":</strong> " + content[key];
+                        parentElement.appendChild(contentElement);
+                    }
+                }
+            }
+        }
+
+        function displayJSONValues(json, containerId) {
+            var container = document.getElementById(containerId);
+
+            for (var key in json) {
+                if (json.hasOwnProperty(key)) {
+                    var keyElement = document.createElement("h2");
+                    keyElement.textContent = key + ": ";
+
+                    if (typeof json[key] === "object") {
+                        var nestedContainer = document.createElement("div");
+                        nestedContainer.classList.add("nested-container");
+                        keyElement.appendChild(nestedContainer);
+                        displayJSONValues(json[key], containerId);
+                    } else {
+                        var valueElement = document.createElement("div");
+                        valueElement.textContent = json[key];
+
+                        container.appendChild(keyElement);
+                        container.appendChild(valueElement);
+
+                        container.appendChild(document.createElement("br"));
+                    }
+                }
+            }
+        }
+
+        var documentt = '{{ document|safe|escapejs }}';
+        var jsonDocument = JSON.parse(documentt);
+        console.log(jsonDocument);
+
+        var data = '{{ data|safe|escapejs }}';
+        if (data) {
+            data = JSON.parse(data);
+            console.log(data);
+
+            var newHeading = document.createElement("h2");
+            newHeading.textContent = "New";
+            document.getElementById("srs-container").appendChild(newHeading);
+
+            var oldHeading = document.createElement("h2");
+            oldHeading.textContent = "Old";
+            document.getElementById("json-container").appendChild(oldHeading);
+
+            document.getElementById("srs-container").classList.add("div1");
+            document.getElementById("json-container").classList.add("div2");
+
+            displaySRS(data, "srs-container");
+            displaySRS(jsonDocument, "json-container");
+        } else {
+            console.log("No additional data: " + data);
+            document.getElementById("srs-container").classList.remove("div1");
+            document.getElementById("json-container").style.display = 'none';
+            displaySRS(jsonDocument, "srs-container");
+        }
+
+        
+
+
+        // ==============================================
+
+        var container = document.getElementById("jsoneditor");
+        var options = {};
+        var editor = new JSONEditor(container, options);
+
+        var editorDocument = '{{ document|safe|escapejs }}';
+
+        var editorDocument = JSON.parse(editorDocument);
+        editor.set(editorDocument);
+
+        document.getElementById("saveBtn").addEventListener("click", function() {
+            var editedDocument = editor.get();
+            console.log("22")
+            console.log(JSON.stringify(editedDocument))
+            fetch('/app_detail/{{app.id}}/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}' 
+                },
+                body: JSON.stringify(editedDocument)
+            })
+            //.then(response => response.json())
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    console.error('Error:', response.statusText);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+{% endblock %}

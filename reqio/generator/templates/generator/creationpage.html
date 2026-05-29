@@ -1,0 +1,197 @@
+{% extends 'generator/base.html' %}
+
+{% block content %}
+    <style>
+        #makeSRS {
+            width: 100%;
+            min-width: 500px;
+        }
+        .btn-outline-primary{
+            min-width: 500px;
+        }
+    </style>    
+
+    <div class="container">
+        <div class="d-flex justify-content-center align-items-center">
+            <form id="query-form" class="text-center mt-5">
+                <div id="makeSRS" class="form-group">
+                    <label for="name" class="form-label">Enter project name:</label>
+                    <input type="text" name="name" id="name" class="form-control" required>
+                </div>
+                <div class="form-group mt-2">
+                    <label for="prompt" class="form-label">What do you want to make?</label>
+                    <textarea type="text" id="prompt" name="prompt" class="form-control" rows="4" required spellcheck="false"></textarea>
+                </div>
+                <button type="submit" class="btn btn-outline-success mt-3" >Create your requirements document</button>
+                
+            </form>
+        </div>
+    </div>
+    
+    <div id="response" hidden>
+        {% if response %}
+            {{response}}
+        {% endif %}
+    </div>
+
+    <div class="container" id="pito">
+        <div class="d-flex justify-content-center align-items-center" id="formContainer">
+
+        </div>
+    </div>
+    
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("pito")
+
+            var responseContent = document.getElementById('response').innerText;
+            console.log(responseContent);
+
+            if (responseContent.trim() === "") {
+                console.log('The response is empty.');
+            } else {
+                jsonToHtml(responseContent)
+            }
+            console.log("pito");
+
+            var form = document.getElementById('query-form');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                var name = document.getElementById('name').value;
+                var prompt = document.getElementById('prompt').value;
+
+                var formData = 'name=' + encodeURIComponent(name) + '&prompt=' + encodeURIComponent(prompt);
+
+                fetch("{% url 'generator:assistant_response' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.response);
+                    document.getElementById('response').textContent = jsonToHtml(data.response); 
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                    document.getElementById('response').textContent = 'Failed to get response: ' + error.message;
+                });
+            });
+        });
+
+
+        function jsonToHtml(questions) {
+            questions = JSON.parse(questions);
+            
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            const formContainer = document.getElementById('formContainer');
+            const form = document.createElement('form');
+            form.setAttribute('method', 'post');
+            form.setAttribute('action', '{% url "generator:submit_questions" %}');
+
+            const csrfInput = document.createElement('input');
+            csrfInput.setAttribute('type', 'hidden');
+            csrfInput.setAttribute('name', 'csrfmiddlewaretoken');
+            csrfInput.setAttribute('value', csrfToken);
+            form.appendChild(csrfInput);
+
+            Object.keys(questions).forEach(key => {
+                const div = document.createElement('div');
+                const label = document.createElement('label');
+                label.setAttribute('for', 'answer_' + key);
+                label.setAttribute("class", "form-label");
+                label.textContent = key + ": " + questions[key];
+
+                const input = document.createElement('input');
+                input.setAttribute('type', 'text');
+                input.setAttribute('id', 'answer_' + key);
+                input.setAttribute('name', 'answer_' + key);
+                input.setAttribute('class', 'form-control');
+                input.setAttribute('required', true);
+
+                div.appendChild(label);
+                div.appendChild(document.createElement('br'));
+                div.appendChild(input);
+                form.appendChild(div);
+            });
+
+            const submitButton = document.createElement('input');
+            submitButton.setAttribute('type', 'submit');
+            submitButton.setAttribute('name', 'action');
+            submitButton.setAttribute('value', 'Answer');
+            submitButton.setAttribute('id', 'answer');
+            submitButton.setAttribute('class', 'btn btn-success');
+            form.appendChild(submitButton);
+            
+            formContainer.appendChild(form);
+
+
+            const form2 = document.createElement('form');
+            form2.setAttribute('method', 'post');
+            form2.setAttribute('action', '{% url "generator:submit_questions" %}');
+
+            const csrfInput2 = document.createElement('input');
+            csrfInput2.setAttribute('type', 'hidden');
+            csrfInput2.setAttribute('name', 'csrfmiddlewaretoken');
+            csrfInput2.setAttribute('value', csrfToken);
+            form2.appendChild(csrfInput2);
+
+            const submitButton2 = document.createElement('input');
+            submitButton2.setAttribute('type', 'submit');
+            submitButton2.setAttribute('name', 'action');
+            submitButton2.setAttribute('id', 'assistant');
+            submitButton2.setAttribute('class', 'btn btn-success');
+            submitButton2.setAttribute('value', 'Let the Assistant decide');
+            form2.appendChild(submitButton2);
+
+            const submitButton3 = document.createElement('input');
+            submitButton3.setAttribute('type', 'submit');
+            submitButton3.setAttribute('name', 'action');
+            submitButton3.setAttribute('value', 'Reset');
+            submitButton3.setAttribute('id', 'reset');
+            submitButton3.setAttribute('class', 'btn btn-danger');
+            form2.appendChild(submitButton3);
+
+
+            formContainer.appendChild(form2);
+
+            const queryForm = document.getElementById('query-form');
+            queryForm.setAttribute('hidden', true);
+
+        };
+
+    </script>
+
+    <!--<script>
+        
+        $(document).ready(function() {
+            $('#query-form').on('submit', function(e) {
+                e.preventDefault();
+                var prompt = $('#prompt').val();
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'generator:assistant_response' %}",
+                    data: {
+                        'prompt': prompt,
+                        'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+                    },
+                    success: function(response) {
+                        $('#response').text('Assistant: ' + response.response);
+                    },
+                    error: function(xhr, errmsg, err) {
+                        $('#response').text('Failed to get response: ' + errmsg);
+                    }
+                });
+            });
+        });
+    </script>-->
+{% endblock %}

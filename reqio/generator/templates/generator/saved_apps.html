@@ -1,0 +1,51 @@
+{% extends 'generator/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <ul class="list-group list-group-flush" id="apps">
+        {% if zipped_list is None %}
+            <div>
+                You have no saved apps
+            </div>
+        {% else %}
+            {% for app,scope in zipped_list %}
+                    <li class="list-group-item">
+                        <a href="{% url 'generator:app_detail' app.id %}">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" role="tab" id="headingOne">
+                                <h2 class="panel-title display-6">
+                                    {{app.name}}
+                                </h2>
+                                </div>
+                                <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                                    <div class="panel-body">
+                                        {{scope}}
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                {% endfor %}
+        {% endif %}
+        
+    </ul>
+</div>
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+
+<script>
+    $(".panel-heading").parent('.panel').hover(
+        function() {
+            $(this).children('.collapse').collapse('show');
+        }, function() {
+            $(this).children('.collapse').collapse('hide');
+        }
+    );
+
+
+</script>
+
+{% endblock %}

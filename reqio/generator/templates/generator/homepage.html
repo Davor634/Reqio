@@ -1,0 +1,22 @@
+{% extends 'generator/base.html' %}
+
+{% block content %}
+    <div class="row-12" id="main">
+        <div class="col-6">
+            <h1 class=display-3>Welcome to Reqio</h1>
+            <h1 class=display-5>We make creating your dream software simple</h1>
+        </div>
+        <div class="col-6">
+            <div class="card text-center">
+                
+                <div class="card-body">
+                  <h5 class="card-title">Creating requirements documents is now much simpler.</h5>
+                  <p class="card-text mt-5">Good requirements are necessary for a succesful project and thats where reqio comes in. We integrated AI to help you in creating requirements which makes the otherwise tiring procces of writing requirements easy. Just click bellow to create a new project or to view previous projects</p>
+                  <a class="btn btn-success" href="{% url 'generator:assistant_response' %}">Create Project</a>
+                  <a class="btn btn-success ms-4" href="{% url 'generator:saved' %}">Saved Projects</a>
+                </div>
+              </div>
+        </div>
+    </div>
+    
+{% endblock %}

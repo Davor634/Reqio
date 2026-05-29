@@ -1,0 +1,112 @@
+.navbar-nav li:nth-of-type(2){
+    font-weight: 450;
+    font-size: 18px;
+    text-align: center;
+    line-height: 40px;
+    color:white;
+}
+
+.navbar-nav li:nth-of-type(3){
+    font-weight: 450;
+    font-size: 18px;
+    text-align: center;
+    line-height: 40px;
+    color: white;
+}
+
+.navbar-nav li:nth-of-type(2) a{
+    color:white;  
+    text-decoration: none;
+}
+
+.navbar-nav li:nth-of-type(3) a{
+    text-align: center;
+    line-height: 40px;
+    color:white;
+}
+
+#topBar div:nth-of-type(3) a{
+    color:white;  
+    text-decoration: none;
+}
+
+#main{
+    width: 100%;
+    height: 41em;
+    background: #198754;
+    display: flex;
+    justify-content: center;
+    vertical-align: top;
+
+}
+
+.card-title{
+    font-size: xx-large;
+    margin-top: 30px;
+}
+
+.card-text{
+    font-size: larger;
+    margin-bottom: 120px;
+    
+}
+
+
+.display-3 {
+    font-weight: 450;
+    color: white;
+    text-align: center;
+    margin-top: 100px;
+}
+
+.display-5 {
+    color: white;
+    text-align: center;
+}
+
+#main div .card{
+    height: 500px;
+    margin: 50px 50px 0px 50px;
+   
+}
+
+#apps{
+    margin-top: 50px;
+    margin-left: 100px;
+    margin-right: 100px;
+}
+
+
+
+.display-6{
+    text-align: center;
+}
+
+#apps li a{
+    text-decoration: none;
+    color:black;
+}
+
+#response{
+    margin-top: 100px;
+}
+
+#pito{
+    margin-top: 50px;
+}
+
+#answer{
+    margin-top: 15px;
+}
+#assistant{
+    margin-left: 15px;
+    margin-top: 15px;
+}
+#reset{
+    margin-left: 15px;
+    margin-top: 15px;
+}
+
+
+
+

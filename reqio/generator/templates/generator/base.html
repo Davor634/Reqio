@@ -1,0 +1,88 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <link rel="stylesheet" href="{% static 'generator/base.css' %}">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+        <meta name="csrf-token" content="{{ csrf_token }}">
+
+    </head>
+    <body>
+
+        <style>
+            .button-no-decoration {
+                background: none;
+                border: none;
+                color: inherit;
+                font: inherit;
+                cursor: pointer;
+                outline: none;
+                padding: 0;
+                margin: 0;
+            }
+            .dropdown-item {
+                color: #fff;
+                text-align: center; 
+            }
+
+            .dropdown-item:hover,
+            .dropdown-item:focus {
+                color: #ccc;
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+            .nav-item{
+                text-align: center;
+                font-size: medium;
+            }
+        </style>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <div class="container-fluid">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown" aria-controls="navbarNavDarkDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
+                        <ul class="navbar-nav d-flex w-100 justify-content-between">
+                            <li class="nav-item dropdown" style="text-align: center;">
+                                <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Projects
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-dark">
+                                    <li><a class="dropdown-item" href="{% url 'generator:assistant_response' %}">New Project</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'generator:saved' %}">Saved Projects</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <div>
+                                    <a class="dropdown-item" href="{% url 'generator:home' %}">Reqio</a>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <div>
+                                    {% if user.is_authenticated %}
+                                        <form action="{% url 'generator:logout' %}" method="post">
+                                            {% csrf_token %}
+                                            <input type="submit" class="button-no-decoration" value="Welcome, {{ user.username }}!">
+                                        </form>
+                                    {% else %}
+                                        <a href="{% url 'generator:login' %}">Login</a>
+                                    {% endif %}
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        
+        <main>
+            {% block content %}
+
+            {% endblock %}
+        </main>               
+    </body>
+
+</html>
