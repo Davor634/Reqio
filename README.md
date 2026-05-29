@@ -4,7 +4,7 @@ A Django web application that uses the OpenAI API to generate structured softwar
 
 ---
 
-## 🚀 Features
+## Features
 
 * Input a simple project description
 * Generate a structured requirements document using OpenAI
@@ -14,7 +14,7 @@ A Django web application that uses the OpenAI API to generate structured softwar
 
 ---
 
-## 🧠 How It Works
+## How It Works
 
 1. User submits a project description through the web interface
 2. Django backend sends the prompt to OpenAI API
@@ -24,7 +24,7 @@ A Django web application that uses the OpenAI API to generate structured softwar
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 * Python 3.10+
 * Django
